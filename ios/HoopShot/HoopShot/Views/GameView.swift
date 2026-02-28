@@ -12,7 +12,7 @@ struct GameView: View {
     let token: String
 
     // Timer
-    @State private var timeLeft: Int = 60
+    @State private var timeLeft: Int = 30
     @State private var timer: Timer? = nil
 
     // Score tracking
@@ -146,7 +146,7 @@ struct GameView: View {
         let controlX = start.x + dx * 0.3
         let controlY = min(start.y, hoop.y) - 80
 
-        var steps = 60
+        let steps = 60
         let stepDuration = duration / Double(steps)
         var step = 0
 
@@ -196,7 +196,7 @@ struct GameView: View {
     // MARK: - Timer
 
     private func startTimer() {
-        timeLeft = 60
+        timeLeft = 30
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             if timeLeft > 0 {

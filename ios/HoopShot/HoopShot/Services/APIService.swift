@@ -22,11 +22,7 @@ actor APIService {
             ?? "http://localhost:8000"
     }()
 
-    private let decoder: JSONDecoder = {
-        let d = JSONDecoder()
-        d.keyDecodingStrategy = .convertFromSnakeCase
-        return d
-    }()
+    private let decoder = JSONDecoder()
 
     private func request<T: Decodable>(
         path: String,
