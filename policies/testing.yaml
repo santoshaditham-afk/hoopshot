@@ -1,0 +1,81 @@
+# Testing Policy — HoopShot
+# Covers unit tests, functional/integration tests, and test coverage requirements
+name: testing
+version: "1.0"
+
+rules:
+  # ── Unit Tests ────────────────────────────────────────────────────────────
+
+  - id: TEST-001
+    description: "Backend auth helpers must have unit tests (hash, verify, create_token)"
+    severity: high
+    check: test_file_exists
+    file: "backend/tests/test_auth.py"
+
+  - id: TEST-002
+    description: "Backend score calculation logic must have unit tests"
+    severity: medium
+    check: test_file_exists
+    file: "backend/tests/test_scores.py"
+
+  - id: TEST-003
+    description: "Frontend API wrapper functions must have unit tests"
+    severity: medium
+    check: test_file_exists
+    file: "frontend/src/lib/api.test.ts"
+
+  - id: TEST-004
+    description: "iOS APIService must have unit tests (mocked URLSession)"
+    severity: medium
+    check: test_file_exists
+    file: "ios/HoopShot/HoopShotTests/APIServiceTests.swift"
+
+  # ── Functional / Integration Tests ────────────────────────────────────────
+
+  - id: TEST-005
+    description: "Backend must have integration tests covering full auth flow"
+    severity: high
+    check: test_file_exists
+    file: "backend/tests/test_auth_integration.py"
+    note: "register -> login -> /auth/me round-trip using TestClient"
+
+  - id: TEST-006
+    description: "Backend must have integration tests for score submission and leaderboard"
+    severity: high
+    check: test_file_exists
+    file: "backend/tests/test_scores_integration.py"
+    note: "POST /scores -> GET /scores/me -> GET /scores/leaderboard"
+
+  - id: TEST-007
+    description: "/health endpoint must be tested (returns 200 + status=ok)"
+    severity: medium
+    check: test_file_exists
+    file: "backend/tests/test_health.py"
+
+  # ── Coverage ──────────────────────────────────────────────────────────────
+
+  - id: TEST-008
+    description: "Backend test coverage must be >= 80%"
+    severity: high
+    check: manual_review
+    note: "Run: pytest --cov=app --cov-fail-under=80"
+
+  - id: TEST-009
+    description: "All API endpoints must have at least one happy-path test"
+    severity: high
+    check: manual_review
+    note: "Endpoints: POST /auth/register, POST /auth/login, GET /auth/me, POST /scores, GET /scores/me, GET /scores/leaderboard"
+
+  # ── CI Gate ───────────────────────────────────────────────────────────────
+
+  - id: TEST-010
+    description: "Tests must run in CI before any Docker image is built"
+    severity: critical
+    check: manual_review
+    note: "CI order: 1) policy-check  2) tests  3) docker build  4) deploy"
+
+  - id: TEST-011
+    description: "Tests must use an isolated test database (not the production db)"
+    severity: critical
+    check: manual_review
+    note: "Use SQLite in-memory (sqlite:///:memory:) or a tmp file in conftest.py"

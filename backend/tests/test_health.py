@@ -1,0 +1,11 @@
+"""Test /health endpoint."""
+
+
+def test_health_returns_200(client):
+    resp = client.get("/health")
+    assert resp.status_code == 200
+
+
+def test_health_returns_ok_status(client):
+    resp = client.get("/health")
+    assert resp.json() == {"status": "ok"}

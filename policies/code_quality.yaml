@@ -1,0 +1,52 @@
+# Code Quality Policy — HoopShot
+name: code_quality
+version: "1.0"
+
+rules:
+  - id: CQ-001
+    description: "Python files must not use bare except clauses"
+    severity: medium
+    check: no_bare_except
+    patterns:
+      - "^\\s*except:\\s*$"
+    file_types:
+      - "*.py"
+
+  - id: CQ-002
+    description: "No TODO/FIXME/HACK comments left in production code"
+    severity: low
+    check: no_todo_comments
+    patterns:
+      - "(?i)(TODO|FIXME|HACK|XXX):"
+    note: "Resolve or create a tracked issue before merging"
+
+  - id: CQ-003
+    description: "TypeScript: no use of any type without explicit justification comment"
+    severity: medium
+    check: no_implicit_any
+    patterns:
+      - ":\\s*any[^/\\n]*$"
+    file_types:
+      - "*.ts"
+      - "*.tsx"
+
+  - id: CQ-004
+    description: "Swift: force-unwraps must not appear in production paths"
+    severity: high
+    check: no_force_unwrap
+    patterns:
+      - "\\w+!\\."
+    file_types:
+      - "*.swift"
+    note: "Use guard let / if let instead"
+
+  - id: CQ-005
+    description: "All new Python modules must have an __init__.py"
+    severity: low
+    check: manual_review
+
+  - id: CQ-006
+    description: "Frontend API calls must handle errors and not silently fail"
+    severity: medium
+    check: manual_review
+    note: "Every fetch/async call in src/lib/api.ts must throw on non-2xx"

@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Database
+*.db
+*.sqlite
+backend/data/
+
+# Node
+node_modules/
+.next/
+frontend/.next/
+
+# iOS / Xcode
+ios/HoopShot/*.xcodeproj/xcuserdata/
+ios/HoopShot/DerivedData/
+*.xcworkspace/xcuserdata/
+
+# Env & secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.p12
+*.p8
+
+# OS
+.DS_Store

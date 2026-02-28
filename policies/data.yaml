@@ -1,0 +1,34 @@
+# Data & Privacy Policy — HoopShot
+name: data
+version: "1.0"
+
+rules:
+  - id: DATA-001
+    description: "Only username is stored; no email, phone, or PII"
+    severity: high
+    check: manual_review
+    note: "User model must not gain new PII fields without privacy review"
+
+  - id: DATA-002
+    description: "Passwords must be hashed with bcrypt (cost >= 12 rounds default)"
+    severity: critical
+    check: manual_review
+    note: "passlib CryptContext with bcrypt satisfies this; do not downgrade"
+
+  - id: DATA-003
+    description: "SQLite DB file must not be committed to version control"
+    severity: high
+    check: gitignore_db
+    file: ".gitignore"
+    pattern: '\.db'
+
+  - id: DATA-004
+    description: "JWT tokens expire within 7 days"
+    severity: medium
+    check: manual_review
+    note: "ACCESS_TOKEN_EXPIRE_MINUTES <= 10080 in backend/app/auth.py"
+
+  - id: DATA-005
+    description: "Score data is not PII — safe to expose on leaderboard with username"
+    severity: info
+    check: informational

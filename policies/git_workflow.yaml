@@ -1,0 +1,130 @@
+# Git Workflow Policy — HoopShot
+# Governs commits, PRs, merges, and branching for CI/CD + Kubernetes deployments
+name: git_workflow
+version: "1.0"
+
+rules:
+  # ── Commits ───────────────────────────────────────────────────────────────
+
+  - id: GIT-001
+    description: "Commit messages must follow Conventional Commits format"
+    severity: medium
+    check: manual_review
+    note: |
+      Format: <type>(<scope>): <subject>
+      Types: feat | fix | chore | refactor | test | docs | ci | perf
+      Examples:
+        feat(backend): add /scores/leaderboard endpoint
+        fix(ios): prevent nil token crash on launch
+        ci: add policy checker to pre-commit hook
+
+  - id: GIT-002
+    description: "No direct commits to main/master — all changes via PR"
+    severity: high
+    check: manual_review
+    note: "Enforce with branch protection rules on GitHub/GitLab"
+
+  - id: GIT-003
+    description: "Commits must not include build artefacts or secrets"
+    severity: critical
+    check: no_committed_secrets
+    patterns:
+      - "\\.env$"
+      - "\\*\\.db"
+      - "\\.pem$"
+      - "\\.key$"
+    note: "Checked via .gitignore; review staged files before commit"
+
+  - id: GIT-004
+    description: "No force-push to protected branches (main, release/*)"
+    severity: critical
+    check: manual_review
+    note: "Configure branch protection: disallow force-push on main and release/*"
+
+  # ── Pull Requests ──────────────────────────────────────────────────────────
+
+  - id: PR-001
+    description: "Every PR must have a description explaining the change"
+    severity: medium
+    check: manual_review
+    note: "PR template should include: What, Why, How to test"
+
+  - id: PR-002
+    description: "PRs must reference an issue or ticket (closes #N)"
+    severity: low
+    check: manual_review
+    note: "Use 'closes #N' or 'relates to #N' in PR body"
+
+  - id: PR-003
+    description: "PRs must pass all automated checks before merge (CI green)"
+    severity: critical
+    check: manual_review
+    note: "Require status checks: policy-check, backend-tests, frontend-lint"
+
+  - id: PR-004
+    description: "PRs require at least 1 approving review before merge"
+    severity: high
+    check: manual_review
+    note: "Configure branch protection: required_approving_review_count >= 1"
+
+  - id: PR-005
+    description: "PRs touching Dockerfiles or k8s manifests require explicit review"
+    severity: high
+    check: manual_review
+    note: "Use CODEOWNERS to auto-request review for Dockerfile and k8s/ changes"
+
+  # ── Merges ─────────────────────────────────────────────────────────────────
+
+  - id: MERGE-001
+    description: "Squash merge preferred for feature branches to keep history clean"
+    severity: low
+    check: manual_review
+    note: "Prefer squash-and-merge on GitHub for feature/* branches"
+
+  - id: MERGE-002
+    description: "Merge commits on main must trigger Docker image build + push"
+    severity: high
+    check: manual_review
+    note: "CI pipeline must build and tag images on merge to main: hoopshot-backend:<sha>"
+
+  - id: MERGE-003
+    description: "main must always be deployable (no broken builds)"
+    severity: critical
+    check: manual_review
+    note: "All tests and policy checks are required CI gates before merge"
+
+  # ── Branching & Versioning ────────────────────────────────────────────────
+
+  - id: BRANCH-001
+    description: "Branch names must follow convention"
+    severity: low
+    check: manual_review
+    note: |
+      Allowed prefixes: feature/, fix/, chore/, release/, hotfix/
+      Example: feature/ios-swipe-gesture, fix/jwt-expiry
+
+  - id: BRANCH-002
+    description: "Release branches must be tagged with semver before deployment"
+    severity: high
+    check: manual_review
+    note: "Tags must be semver: v1.0.0, v1.1.0-rc1 etc. Docker images tagged with this version"
+
+  # ── Audit ──────────────────────────────────────────────────────────────────
+
+  - id: AUDIT-001
+    description: "scripts/record_merge.py must exist for merge checkpoint recording"
+    severity: high
+    check: file_exists
+    file: scripts/record_merge.py
+
+  - id: AUDIT-002
+    description: ".github/workflows/merge-checkpoint.yml must exist for CI audit trigger"
+    severity: high
+    check: file_exists
+    file: .github/workflows/merge-checkpoint.yml
+
+  - id: AUDIT-003
+    description: "pr_audit.db must be excluded from git (covered by *.db in .gitignore)"
+    severity: medium
+    check: manual_review
+    note: "Verify *.db is present in .gitignore so pr_audit.db is never committed"

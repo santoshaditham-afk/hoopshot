@@ -1,0 +1,40 @@
+# API Design Policy — HoopShot
+name: api_design
+version: "1.0"
+
+rules:
+  - id: API-001
+    description: "All endpoints must return JSON (no plain-text responses)"
+    severity: medium
+    check: manual_review
+
+  - id: API-002
+    description: "POST endpoints creating resources must return HTTP 201"
+    severity: low
+    check: manual_review
+    note: "Use status_code=status.HTTP_201_CREATED on POST router decorators"
+
+  - id: API-003
+    description: "Error responses must include a 'detail' field"
+    severity: medium
+    check: manual_review
+    note: "FastAPI HTTPException default satisfies this; custom errors must too"
+
+  - id: API-004
+    description: "All endpoints must be documented with a summary or tags"
+    severity: low
+    check: router_has_tags
+    note: "Routers must set tags= parameter so /docs is navigable"
+
+  - id: API-005
+    description: "/health endpoint must exist and return 200 with status=ok"
+    severity: high
+    check: health_endpoint_exists
+    file: "backend/app/main.py"
+    pattern: "@app\\.get\\([\"']"
+
+  - id: API-006
+    description: "Leaderboard must be publicly accessible (no auth required)"
+    severity: medium
+    check: manual_review
+    note: "/scores/leaderboard must NOT use get_current_user dependency"

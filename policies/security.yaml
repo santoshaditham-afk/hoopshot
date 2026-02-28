@@ -1,0 +1,47 @@
+# Security Policy — HoopShot
+name: security
+version: "1.0"
+
+rules:
+  - id: SEC-001
+    description: "No hardcoded secrets in source files"
+    severity: critical
+    check: no_hardcoded_secrets
+    patterns:
+      - "(?i)\\b(password|secret|api_key)\\s*=\\s*[\"'][^\"']{6,}[\"']"
+    exclude_paths:
+      - "backend/app/auth.py"
+
+  - id: SEC-002
+    description: "JWT secret must not be the default value in production Docker images"
+    severity: high
+    check: no_default_jwt_secret
+    note: "Ensure SECRET_KEY is injected via env var before building prod image"
+
+  - id: SEC-003
+    description: "All auth-required endpoints must use Depends(get_current_user)"
+    severity: critical
+    check: manual_review
+    note: "Verify every endpoint under /scores/* uses get_current_user dependency"
+
+  - id: SEC-004
+    description: "Passwords must never be stored or logged in plaintext"
+    severity: critical
+    check: no_plaintext_password_log
+    patterns:
+      - "(?i)(print|logger?\\.)\\s*[\\(\"'].*password"
+      - "(?i)logging\\..*password"
+
+  - id: SEC-005
+    description: "CORS must be restricted to known origins in production"
+    severity: medium
+    check: manual_review
+    note: "Current allow_origins=['*'] is acceptable for v1 dev only. Restrict before prod."
+
+  - id: SEC-006
+    description: "No SQL string interpolation (use ORM or parameterised queries)"
+    severity: critical
+    check: no_raw_sql_interpolation
+    patterns:
+      - "execute\\(f\""
+      - "execute\\(f'"
