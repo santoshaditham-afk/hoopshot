@@ -1,5 +1,7 @@
+from __future__ import annotations
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 
 class UserCreate(BaseModel):
@@ -32,6 +34,6 @@ class ScoreOut(BaseModel):
     shots_taken: int
     shots_made: int
     created_at: datetime
-    username: str | None = None
+    username: Optional[str] = None
 
     model_config = {"from_attributes": True}
